@@ -14,7 +14,7 @@ const FriendRequest_shema = new Schema({
 
   status: {
     type: String,
-    enum: ["Respons", "Friend", "Rejected", null, "Can't request"],
+    enum: ["Respons", "Flow", "Rejected", null, "Can't request"],
     default: null,
   },
   createdAt: {
@@ -28,13 +28,16 @@ const user_shema = new Schema(
   {
     email: { type: String },
     phone: { type: Number },
-     name: { type: String },
-    birth: { type: String },
+    lastname: { type: String },
+    firstname: { type: String },
+    birthday: { type: String },
     gender: { type: String },
-     
+    bio: { type: String },
     avatar: { type: String },
+    cover_photo: { type: String },
     password: { type: String },
     fcmToken: [{ type: String }],
+    post_cout: { type: Number },
     friend: [
       // cai này co nghĩa la user này đã được thực hiện việc có
       {
@@ -53,22 +56,10 @@ const user_shema = new Schema(
       type: Number,
       default: 0,
     },
-    number_follow: {
+    number_follower: {
       type: Number,
       default: 0,
     },
-    like_article: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "user",
-      },
-    ],
-    like_video: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "user",
-      },
-    ],
   },
   {
     timestamps: true,
