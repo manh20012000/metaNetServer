@@ -38,6 +38,7 @@ const user_shema = new Schema(
     password: { type: String },
     fcmToken: [{ type: String }],
     post_cout: { type: Number },
+    isVerified: { type: Boolean, default: false },
     friend: [
       // cai này co nghĩa la user này đã được thực hiện việc có
       {
