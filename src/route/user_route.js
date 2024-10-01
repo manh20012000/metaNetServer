@@ -1,7 +1,8 @@
 import { login, register, update_user } from "../controller/user_controller.js";
 import express from "express";
 import multer from "multer";
-
+import uuid from "react-uuid";
+import path from "path";
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "public/avatar_user/");

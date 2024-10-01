@@ -1,9 +1,5 @@
 import user_shema from "../model/user_model.js";
 import express from "express";
-import path from "path";
-import multer from "multer";
-import uuid from "react-uuid";
-import appRoot from "app-root-path";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import {
@@ -13,6 +9,13 @@ import {
 const user = express();
 const login = async (req, res) => {};
 const register = async (req, res) => {
+  const filePath = req.file.filename;
+  let infor = {
+    protocol: req.protocol,
+    host: req.get("host"),
+  };
+  const avatarpath = `${infor.protocol}://${infor.host}/avatar_user/${filePath}`;
+
   const saltRounds = 10;
   const {
     email,
@@ -25,23 +28,23 @@ const register = async (req, res) => {
     password,
   } = req.body;
   try {
-    const find_user = await user.findOne({ email: email });
+    const find_user = await user_shema.findOne({ email: email });
     if (find_user)
       return res
         .status(301)
         .json({ message: "user này đã tồn tại?", status: 301 });
     else {
       const passw = await bcrypt.hash(password, saltRounds);
-      const Register = new user({
-        email: email,
-        phone: phone,
-        lastname: lastname,
-        firstname: firstname,
-        birthday: birthday,
+      const Register = new user_shema({
+        email: email ?? " ",
+        phone: phone ?? " ",
+        lastname: lastname ?? " ",
+        firstname: firstname ?? " ",
+        birthday: birthday ?? " ",
         gender: gender ?? " ",
-        Taikhoan: email,
-        avatar: avatar,
-        password: passw,
+        Taikhoan: email ?? " ",
+        avatar: avatarpath ?? " ",
+        password: passw ?? " ",
         fcmToken: [],
       }).save();
       return res
