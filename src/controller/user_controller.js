@@ -6,15 +6,16 @@ import {
   gennerateTokenAndsetCookies,
   genneratefreshTokenAndsetCookies,
 } from "../util/genarate_Token.js";
+
 const user = express();
 const login = async (req, res) => {};
 const register = async (req, res) => {
-  const filePath = req.file.filename;
-  let infor = {
-    protocol: req.protocol,
-    host: req.get("host"),
-  };
-  const avatarpath = `${infor.protocol}://${infor.host}/avatar_user/${filePath}`;
+  // const filePath = req.file.filename;
+  // let infor = {
+  //   protocol: req.protocol,
+  //   host: req.get("host"),
+  // };
+  // const avatarpath = `${infor.protocol}://${infor.host}/avatar_user/${filePath}`;
 
   const saltRounds = 10;
   const {
@@ -28,6 +29,7 @@ const register = async (req, res) => {
     password,
   } = req.body;
   try {
+    console.log(req.body, "password");
     const find_user = await user_shema.findOne({ email: email });
     if (find_user)
       return res
@@ -43,10 +45,11 @@ const register = async (req, res) => {
         birthday: birthday ?? " ",
         gender: gender ?? " ",
         Taikhoan: email ?? " ",
-        avatar: avatarpath ?? " ",
+        avatar: avatar ?? " ",
         password: passw ?? " ",
         fcmToken: [],
       }).save();
+      console.log("thành công");
       return res
         .status(201)
         .json({ message: "đăng ký thành công", status: 201 });
