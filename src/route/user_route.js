@@ -29,8 +29,13 @@ let upload = multer({ storage: storage, imageFilter: imageFilter });
 const user = express();
 
 user.post("/user/login", login);
-user.post("/user/register", upload.single("avatar"), register);
+user.post("/user/register", upload.none(), register);
 user.post("/user/update_user/:id", update_user);
 user.put("/user/refreshToken");
+user.post("/user/get_all_user", async (req, res) => {
+  console.log("hâhahah");
+  return res.status(200).json({ mess: "lấy thành coong" });
+});
 user.options("/user/fcmtoken");
+
 export default user;
