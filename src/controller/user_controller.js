@@ -6,7 +6,7 @@ import {
   gennerateTokenAndsetCookies,
   genneratefreshTokenAndsetCookies,
 } from "../util/genarate_Token.js";
-
+import twilio from "twilio ";
 const user = express();
 const login = async (req, res) => {};
 const register = async (req, res) => {
@@ -60,4 +60,18 @@ const register = async (req, res) => {
   }
 };
 const update_user = async (req, res) => {};
-export { login, register, update_user };
+const forgetPassword = async (req, res) => {
+  const { numberRandom, numberPhone } = req.body;
+  try {
+    const finuser = user_shema.findOne({ phone: numberPhone });
+    if (!finuser) return res.status(404).json({ message: 'not found phoneNumber' })
+    else if (finuser) {
+  
+  
+    }
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ message: 'error' })
+  }
+};
+export { login, register, update_user, forgetPassword };

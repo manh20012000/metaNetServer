@@ -1,4 +1,9 @@
-import { login, register, update_user } from "../controller/user_controller.js";
+import {
+  login,
+  register,
+  update_user,
+  forgetPassword,
+} from "../controller/user_controller.js";
 import express from "express";
 import multer from "multer";
 import uuid from "react-uuid";
@@ -31,6 +36,7 @@ const user = express();
 user.post("/user/login", login);
 user.post("/user/register", upload.none(), register);
 user.post("/user/update_user/:id", update_user);
+user.post("/user/send-forget", forgetPassword);
 user.put("/user/refreshToken");
 user.post("/user/get_all_user", async (req, res) => {
   console.log("hâhahah");
