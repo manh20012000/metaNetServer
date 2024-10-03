@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-export const gennerateTokenAndsetCookie = (userId, res) => {
+export const gennerateTokenAndsetCookies = (userId, res) => {
   const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
     expiresIn: "1h", // Thời hạn của token là 5 giờ
   });
@@ -13,7 +13,7 @@ export const gennerateTokenAndsetCookie = (userId, res) => {
   });
   return token;
 };
-export const genneratefreshTokenAndsetCookie = (userId, res) => {
+export const genneratefreshTokenAndsetCookies = (userId, res) => {
   const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
     expiresIn: "15d",
   });

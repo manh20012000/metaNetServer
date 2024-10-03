@@ -1,4 +1,4 @@
-import { app, server } from "./server.js";
+import { app, server, express } from "./server.js";
 import cors from "cors";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
@@ -8,6 +8,7 @@ app.use(cors({ origin: "*" })); // thực hiện cấu hính cho bất kỳ đư
 app.use(bodyParser.json()); // for JSON data
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(express.static("public"));
 connectDB.connect();
 app.use("/api", user);
 app.get("/", (req, res) => {
