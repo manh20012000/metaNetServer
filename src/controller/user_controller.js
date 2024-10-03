@@ -2,9 +2,11 @@ import user_shema from "../model/user_model.js";
 import express from "express";
 import bcrypt from "bcrypt";
 import {
-  genneratefreshTokenAndsetCookie,
-  gennerateTokenAndsetCookie,
+  genneratefreshTokenAndsetCookies,
+  gennerateTokenAndsetCookies,
 } from "../util/genarate_Token.js";
+import twilio from "twilio";
+const user = express();
 // const user = express();
 const login = async (req, res) => {
   try {
@@ -38,10 +40,10 @@ const login = async (req, res) => {
     const { password, fcmToken, ...userData } = user.toObject();
 
     // generate access token
-    const accessToken = gennerateTokenAndsetCookie(user._id, res);
+    const accessToken = gennerateTokenAndsetCookies(user._id, res);
 
     // generate refresh token
-    const refreshToken = genneratefreshTokenAndsetCookie(user._id, res);
+    const refreshToken = genneratefreshTokenAndsetCookies(user._id, res);
     // success response
     return res.status(200).json({
       success: true,
@@ -60,8 +62,6 @@ const login = async (req, res) => {
   }
 };
 
-import twilio from "twilio ";
-const user = express();
 const register = async (req, res) => {
   // const filePath = req.file.filename;
   // let infor = {
