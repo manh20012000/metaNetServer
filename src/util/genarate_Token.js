@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 export const gennerateTokenAndsetCookies = (userId, res) => {
   const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
-    expiresIn: "1h", // Thời hạn của token là 5 giờ
+    expiresIn: "2h", // Thời hạn của token là 5 giờ
   });
   // console.log(userId, token, "kog id gennera");
 

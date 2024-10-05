@@ -1,4 +1,4 @@
-import user_shema from "../model/user_model.js";
+import user from "../model/user_model.js";
 import express from "express";
 import bcrypt from "bcrypt";
 import {
@@ -6,12 +6,11 @@ import {
   gennerateTokenAndsetCookies,
 } from "../util/genarate_Token.js";
 import twilio from "twilio";
-const user = express();
-// const user = express();
+
 const login = async (req, res) => {
   try {
     const data = req.body;
-    // check input
+
     if (!data.email || !data.password) {
       return res.status(400).json({
         success: false,
@@ -19,45 +18,49 @@ const login = async (req, res) => {
       });
     }
 
-    const user = await user_shema.findOne({ email: data.email });
-    // check user
-    if (!user) {
+    // tìm bằng cả số điện thoại hoặc tìm bằng cả email
+    const users = await user.findOne({
+      $or: [{ email: data.email }, { phone: data.email }],
+    });
+
+    if (!users) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "Tài khoản hoặc mật khẩu không chính xác",
       });
     }
-
     // compare password
-    const isMatch = await bcrypt.compare(data.password, user.password);
+    const isMatch = await bcrypt.compare(data.password, users.password);
     if (!isMatch) {
       return res.status(400).json({
         success: false,
-        message: "Wrong password",
+        message: "Mật khẩu không hợp lệ",
       });
     }
     // not return password
-    const { password, fcmToken, ...userData } = user.toObject();
-
+    const { password, fcmToken, ...userData } = users.toObject();
     // generate access token
-    const accessToken = gennerateTokenAndsetCookies(user._id, res);
-
+    const accessToken = gennerateTokenAndsetCookies(users._id, res);
     // generate refresh token
-    const refreshToken = genneratefreshTokenAndsetCookies(user._id, res);
+    const refreshToken = genneratefreshTokenAndsetCookies(users._id, res);
     // success response
     return res.status(200).json({
       success: true,
       message: "Logged in successfully",
       data: {
-        userData,
-        accessToken,
-        refreshToken,
+        _id: users._id,
+        name: users.name,
+        avatar: users.avatar,
+        email: users.email,
+        fcmToken: users.fcmToken,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
       },
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Server error",
+      message: "Server error" + error,
     });
   }
 };
@@ -126,4 +129,100 @@ const forgetPassword = async (req, res) => {
     return res.status(500).json({ message: "error" });
   }
 };
-export { login, register, update_user, forgetPassword };
+const loginwithGoogle = async (req, res) => {
+  const users = req.body;
+
+  const userfind = await User.findOne({ email: users.email });
+  if (userfind) {
+    const accessToken = gennerateTokenAndsetCookies(users._id, res);
+    const refreshToken = genneratefreshTokenAndsetCookies(users._id, res);
+    return res.status(200).json({
+      success: true,
+      message: "Logged in successfully",
+
+      data: {
+        _id: userfind._id,
+        name: userfind.name,
+        avatar: userfind.avatar,
+        email: userfind.email,
+        fcmToken: userfind.fcmToken,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      },
+    });
+  }
+  if (!userfind) {
+    const userGoogole = {
+      email: users.email ?? " ",
+      lastname: users.lastname ?? " ",
+      firstname: users.firstname ?? " ",
+      birthday: users.birthday ?? " ",
+      gender: users.gender ?? " ",
+      avatar: users.avatar ?? " ",
+      fcmToken: user.fcmtoken ?? [],
+    };
+
+    const newUser = await User.create(userGoogole);
+    const ascesstoken = await gennerateTokenAndsetCookies(newUser._id, res);
+    const refreshtoken = await genneratefreshTokenAndsetCookies(
+      newUser._id,
+      res
+    );
+    return res.status(200).json({
+      success: true,
+      message: "Logged in successfully",
+      data: {
+        data: {
+          _id: newUser._id,
+          name: newUser.name,
+          avatar: newUser.avatar,
+          email: newUser.email,
+          fcmToken: newUser.fcmToken,
+          accessToken: ascesstoken,
+          refreshToken: refreshtoken,
+        },
+      },
+    });
+  } else {
+    return res.status(404).json({ message: "not found user" });
+  }
+};
+const refreshToken = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken)
+    return res.status(401).json({ err: "No refresh token provided" });
+  const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+
+  if (!decoded) {
+    return res.status(404).json({ err: "authorized- invalid Token" });
+  }
+
+  const users = await user.findById(decoded.userId).select("-Matkhau");
+  if (!users) {
+    return res.status(404).json({ err: "user Notfound" });
+  }
+
+  let token = gennerateTokenAndsetCookies(users._id, res);
+  return res.status(200).json({
+    data: {
+      _id: users._id,
+      name: users.name,
+      avatar: users.avatar,
+      email: users.email,
+      fcmToken: users.fcmToken,
+      accessToken: token,
+      refreshToken: refreshToken,
+    },
+    msg: "OK",
+    status: 200,
+  });
+};
+export {
+  login,
+  register,
+  update_user,
+  forgetPassword,
+  refreshToken,
+  loginwithGoogle,
+};

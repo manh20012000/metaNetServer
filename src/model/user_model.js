@@ -27,7 +27,7 @@ const FriendRequest_shema = new Schema({
 const user_shema = new Schema(
   {
     email: { type: String },
-    phone: { type: Number },
+    phone: { type: String },
     lastname: { type: String },
     firstname: { type: String },
     birthday: { type: String },

@@ -3,6 +3,8 @@ import {
   register,
   update_user,
   forgetPassword,
+  refreshToken,
+  loginwithGoogle,
 } from "../controller/user_controller.js";
 import express from "express";
 import multer from "multer";
@@ -33,11 +35,13 @@ let upload = multer({ storage: storage, imageFilter: imageFilter });
 
 const user = express();
 
-user.post("/user/login", login);
+user.post("/user/login", upload.none(), login);
 user.post("/user/register", upload.none(), register);
 user.post("/user/update_user/:id", update_user);
 user.post("/user/send-forget", forgetPassword);
-user.put("/user/refreshToken");
+user.post("/api/user/siginGoogle", loginwithGoogle);
+user.put("/user/refreshToken", refreshToken);
+
 user.post("/user/get_all_user", async (req, res) => {
   console.log("hâhahah");
   return res.status(200).json({ mess: "lấy thành coong" });
