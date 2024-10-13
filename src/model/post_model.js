@@ -39,6 +39,10 @@ var postSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    propose: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true,

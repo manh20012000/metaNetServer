@@ -49,7 +49,7 @@ const login = async (req, res) => {
       message: "Logged in successfully",
       data: {
         _id: users._id,
-        name: users.name,
+        name: users.lastname + " " + users.firstname,
         avatar: users.avatar,
         email: users.email,
         fcmToken: users.fcmToken,
@@ -142,7 +142,7 @@ const loginwithGoogle = async (req, res) => {
 
       data: {
         _id: userfind._id,
-        name: userfind.name,
+        name: userfind.lastname + " " + userfind.firstname,
         avatar: userfind.avatar,
         email: userfind.email,
         fcmToken: userfind.fcmToken,
@@ -174,7 +174,7 @@ const loginwithGoogle = async (req, res) => {
       data: {
         data: {
           _id: newUser._id,
-          name: newUser.name,
+          name: newUser.lastname + " " + newUser.firstname,
           avatar: newUser.avatar,
           email: newUser.email,
           fcmToken: newUser.fcmToken,
@@ -207,7 +207,7 @@ const refreshToken = async (req, res) => {
   return res.status(200).json({
     data: {
       _id: users._id,
-      name: users.name,
+      name: users.lastname + " " + users.firstname,
       avatar: users.avatar,
       email: users.email,
       fcmToken: users.fcmToken,
@@ -218,6 +218,98 @@ const refreshToken = async (req, res) => {
     status: 200,
   });
 };
+const fcmtoken = async (req, res) => {
+  const User_id = req.params.id;
+  const fcmtoken = req.body.fcmtoken;
+
+  try {
+    const users = await user.findByIdAndUpdate(
+      User_id,
+      { fcmToken: fcmtoken },
+      { new: true, select: "-password" }
+    );
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    return res.status(200).json({
+      data: {
+        _id: users._id,
+        name: users.lastname + " " + users.firstname,
+        avatar: users.avatar,
+        email: users.email,
+        fcmToken: users.fcmToken,
+      },
+      message: "OK",
+      status: 200,
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+const userfindText = async (req, res) => {
+  try {
+    const { keyword } = req.params; // Lấy giá trị name từ query params
+    const { _id } = req.query;
+    console.log(keyword);
+    if (!keyword) {
+      return res
+        .status(400)
+        .json({ error: "Name query parameter is required" });
+    }
+    if (keyword === "@") {
+      // Nếu name là '@', lấy 15 người từ danh sách friendRequest
+      const friends = await user
+        .findById(_id)
+        .select("following") // Chỉ lấy trường following
+        .populate({
+          path: "following", // Populate những người mà user đang follow
+          select: "id lastname firstname avatar", // Chọn các trường cần thiết từ người dùng được follow
+          options: { limit: 15 }, // Giới hạn 15 kết quả
+        })
+        .exec();
+      console.log(friends);
+      // Định dạng dữ liệu trả về
+      const formattedFriends = friends.following.map((friend) => ({
+        id: friend.id,
+        name: `${friend.lastname} ${friend.firstname}`,
+        avatar: friend.avatar,
+      }));
+
+      return res
+        .status(200)
+        .json({ message: "success", status: 200, data: formattedFriends });
+    } else if (keyword.startsWith("@")) {
+      // Sử dụng regex để tìm kiếm gần đúng cho lastname hoặc firstname
+      console.log("ạdjsnjd");
+      const searchKeyword = keyword.slice(1);
+      const users = await user.find({
+        $or: [
+          { lastname: { $regex: searchKeyword, $options: "i" } },
+          { firstname: { $regex: searchKeyword, $options: "i" } },
+        ],
+      })
+        .limit(20) // Giới hạn kết quả trả về 20 người
+        .select("id lastname firstname avatar") // Chọn các trường cần thiết
+        .exec();
+ 
+      // Định dạng dữ liệu trả về theo yêu cầu
+      const formattedUsers = users.map((user) => ({
+        id: user.id,
+        name: `${user.lastname} ${user.firstname}`,
+        avatar: user.avatar,
+      }));
+
+      return res.status(200).json({
+        message: "success",
+        status: 200,
+        data: formattedUsers,
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 export {
   login,
   register,
@@ -225,4 +317,6 @@ export {
   forgetPassword,
   refreshToken,
   loginwithGoogle,
+  fcmtoken,
+  userfindText,
 };

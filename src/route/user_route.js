@@ -5,6 +5,8 @@ import {
   forgetPassword,
   refreshToken,
   loginwithGoogle,
+  fcmtoken,
+  userfindText,
 } from "../controller/user_controller.js";
 import express from "express";
 import multer from "multer";
@@ -41,7 +43,8 @@ user.post("/user/update_user/:id", update_user);
 user.post("/user/send-forget", forgetPassword);
 user.post("/api/user/siginGoogle", loginwithGoogle);
 user.put("/user/refreshToken", refreshToken);
-
+user.put("/user/fcmtoken/:id", fcmtoken);
+user.get("/getMention/:keyword", userfindText);
 user.post("/user/get_all_user", async (req, res) => {
   console.log("hâhahah");
   return res.status(200).json({ mess: "lấy thành coong" });
