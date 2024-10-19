@@ -9,7 +9,7 @@ import {
 
 const postRoutes = express.Router();
 
-postRoutes.post("/create-post", uploads.array("ArayImages", 15), createNewPost);
+postRoutes.post("/create-post", uploads.array("files", 20), createNewPost);
 
 postRoutes.get("/detail-post/:postId", getDetailOfPost);
 postRoutes.put(

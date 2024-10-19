@@ -15,8 +15,8 @@ app.use(bodyParser.json()); // for JSON data
 app.use(bodyParser.urlencoded({ extended: true }));
 connectDB.connect();
 app.use("/api", user);
-app.use("/api/post", postRoutes);
+app.use("/api", postRoutes);
 app.use("/api", routeTagname);
 app.get("/", (req, res) => {
-  res.send("Hello World! hihi");
+    res.send("Hello World! hihi");
 });
