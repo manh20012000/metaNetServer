@@ -1,6 +1,7 @@
 import user from "../model/user_model.js";
 import express from "express";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import {
   genneratefreshTokenAndsetCookies,
   gennerateTokenAndsetCookies,
@@ -115,7 +116,7 @@ const register = async (req, res) => {
     return res.status(500).json({ message: "lỗi " + error, status: 500 });
   }
 };
-const update_user = async (req, res) => {};
+const update_user = async (req, res) => { };
 const forgetPassword = async (req, res) => {
   const { numberRandom, numberPhone } = req.body;
   try {
@@ -189,7 +190,7 @@ const loginwithGoogle = async (req, res) => {
 };
 const refreshToken = async (req, res) => {
   const { refreshToken } = req.body;
-
+  console.log(refreshToken)
   if (!refreshToken)
     return res.status(401).json({ err: "No refresh token provided" });
   const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
@@ -248,8 +249,8 @@ const fcmtoken = async (req, res) => {
 };
 const userfindText = async (req, res) => {
   try {
-    const { keyword } = req.params; // Lấy giá trị name từ query params
-    const { _id } = req.query;
+    // const { keyword } = req.params; // Lấy giá trị name từ query params
+    const { _id, keyword } = req.query;
     console.log(keyword);
     if (!keyword) {
       return res
@@ -291,7 +292,7 @@ const userfindText = async (req, res) => {
         .limit(20) // Giới hạn kết quả trả về 20 người
         .select("id lastname firstname avatar") // Chọn các trường cần thiết
         .exec();
- 
+
       // Định dạng dữ liệu trả về theo yêu cầu
       const formattedUsers = users.map((user) => ({
         id: user.id,

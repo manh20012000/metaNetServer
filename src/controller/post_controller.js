@@ -6,10 +6,10 @@ import path from "path";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 // create new post
-export const createNewPost = async(req, res) => {
+export const createNewPost = async (req, res) => {
     try {
-        const data = {...req.body };
-
+        const data = req.body
+        console.log('jajajaj')
         ffmpeg.setFfmpegPath(ffmpegPath);
         if (req.files && req.files.length > 0) {
             let info = {
@@ -20,7 +20,7 @@ export const createNewPost = async(req, res) => {
 
             // Create image paths
             const processedFiles = await Promise.all(
-                req.files.map(async(file) => {
+                req.files.map(async (file) => {
                     const fileId = uuidv4(); // tạo id duy nhất cho file
                     if (file.mimetype === "video/mp4") {
                         // Chuyển video sang định dạng m3u8 (HLS)
@@ -56,38 +56,61 @@ export const createNewPost = async(req, res) => {
 
                         return {
                             typefile: file.mimetype,
-                            videoUrl: `${info.protocol}://${info.host}/hls/${fileId}.m3u8`,
+                            fileUrl: `${info.protocol}://${info.host}/hls/${fileId}.m3u8`,
                         };
                     } else {
 
                         return {
                             typefile: file.mimetype,
-                            imageUrl: `${info.protocol}://${info.host}/uploads/${file.filename}`,
+                            fileUrl: `${info.protocol}://${info.host}/uploads/${file.filename}`,
                         };
                     }
                 })
             );
-            // data.image_urls = imagePaths;
-
-            // // Create new post with image URLs
-            // const newPost = await Post.create(data);
-            console.log(processedFiles)
+            const newPost = await Post.create({
+                user: data.user,
+                post_content: data.post_content,
+                file: processedFiles,
+                feel: 'đang cảm thấy bị lệ tráp',
+                like: [],
+                count_like: 0,
+                count_comment: 0,
+                is_show: data.is_show,
+                propose: '',
+                permision: '',
+                loaction: data.loaction
+            });
             return res.status(200).json({
                 success: true,
                 message: "Post created successfully",
-                data: processedFiles,
+                data: newPost,
+                status: 200
             });
         } else {
             // No files uploaded, create post with data only
-            const newPost = await Post.create(data);
+            const newPost = await Post.create({
+                user: data.user,
+                post_content: data.post_content,
+                file: [],
+                feel: 'đang cảm thấy bị lệ tráp',
+                like: [],
+                count_like: 0,
+                count_comment: 0,
+                is_show: '',
+                propose: '',
+                permision: data.permision,
+                loaction: data.loaction
+            });
 
             return res.status(200).json({
                 success: true,
                 message: "Post created successfully",
                 data: newPost,
+                status: 200
             });
         }
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             success: false,
             message: "Server error",
@@ -97,7 +120,7 @@ export const createNewPost = async(req, res) => {
 };
 
 // get detail of one user
-export const getDetailOfPost = async(req, res) => {
+export const getDetailOfPost = async (req, res) => {
     try {
         const { postId } = req.params;
         const post = await Post.findById(postId).populate({
@@ -128,13 +151,13 @@ export const getDetailOfPost = async(req, res) => {
 };
 
 // Update post
-export const updatePost = async(req, res) => {
+export const updatePost = async (req, res) => {
     try {
         const { postId } = req.params;
-        const data = {...req.body };
+        const data = { ...req.body };
         // Check if there are files uploaded
         if (req.files && req.files.length > 0) {
-            await uploads.array("ArayImages", 15)(req, res, async() => {
+            await uploads.array("ArayImages", 15)(req, res, async () => {
                 const info = {
                     protocol: req.protocol,
                     host: req.get("host"),
@@ -181,7 +204,7 @@ export const updatePost = async(req, res) => {
 };
 
 // delete post
-export const deletePost = async(req, res) => {
+export const deletePost = async (req, res) => {
     try {
         const { postId } = req.params;
         await Post.findByIdAndDelete(postId);

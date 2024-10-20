@@ -12,7 +12,7 @@ var postSchema = new mongoose.Schema({
     },
     file: [{
         typefile: { type: String, required: true },
-        imageUrl: { type: String, required: true },
+        fileUrl: { type: String, required: true },
     }],
     feel: {
         type: String,
@@ -26,7 +26,7 @@ var postSchema = new mongoose.Schema({
             type: String,
             default: "like",
         },
-    }, ],
+    },],
     count_like: {
         type: Number,
         default: 0,
@@ -42,7 +42,13 @@ var postSchema = new mongoose.Schema({
     propose: {
         type: String,
         default: null,
-    },
+    }, permision: {
+        type: String,
+        default: "public",
+    }, loaction: {
+        type: String,
+        default: null,
+    }
 }, {
     timestamps: true,
 });

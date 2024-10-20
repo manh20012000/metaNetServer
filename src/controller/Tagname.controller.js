@@ -2,12 +2,13 @@ import Tagname from "../model/Tagname.js";
 const getTagName = async (req, res) => {
   try {
     // const keyword = req.params.keyword;
-    console.log(req.params)
-    const keyword = req.query.keyword;
+
+    const keyword = req.query.keyword; console.log(keyword, 'keytag')
     const key = keyword.replace("#", "");
     const tags = await Tagname.find({
       name: { $regex: key, $options: "i" }, // Tìm theo từ khóa không phân biệt hoa thường
     });
+    console.log(tags)
     res.status(200).json({ success: true, data: tags });
   } catch (error) {
     console.error("Error fetching tag names:", error);

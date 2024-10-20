@@ -20,9 +20,9 @@ const storage = multer.diskStorage({
     cb(
       null,
       file.fieldname +
-        "-" +
-        uuid().substring(0, 8) +
-        path.extname(file.originalname)
+      "-" +
+      uuid().substring(0, 8) +
+      path.extname(file.originalname)
     );
   },
 });
@@ -42,9 +42,9 @@ user.post("/user/register", upload.none(), register);
 user.post("/user/update_user/:id", update_user);
 user.post("/user/send-forget", forgetPassword);
 user.post("/api/user/siginGoogle", loginwithGoogle);
-user.put("/user/refreshToken", refreshToken);
+user.post("/user/refreshToken", refreshToken);
 user.put("/user/fcmtoken/:id", fcmtoken);
-user.get("/getMention/:keyword", userfindText);
+user.get("/getMention", userfindText);
 user.post("/user/get_all_user", async (req, res) => {
   console.log("hâhahah");
   return res.status(200).json({ mess: "lấy thành coong" });
